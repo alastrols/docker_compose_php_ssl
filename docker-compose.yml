@@ -1,0 +1,51 @@
+version: "3.3"
+services:
+  # mysql:
+  #   image: mysql:latest
+  #   container_name: mysql
+  #   environment:
+  #     - MYSQL_ROOT_PASSWORD=password
+  #   volumes:
+  #     - ./sql-volumes:/var/lib/mysql
+  # phpmyadmin:
+  #   image: phpmyadmin/phpmyadmin:latest
+  #   container_name: phpmyadmin
+  #   environment:
+  #     - UPLOAD_LIMIT=100000000
+  #   links:
+  #     - mysql:db
+  #   ports:
+  #     - 8081:80
+
+  php:    
+    build: ./php-config/
+    image: php:7.4-fpm
+    container_name: php
+    restart: always
+    expose:  
+      - 9000  
+    volumes:
+      # - /var/www/vhosts/itt-lic-2.com/docker.itt-lic-2.com/web-volumes:/usr/share/nginx/html/
+      - ./web-volumes:/usr/share/nginx/html/
+
+  nginx:
+    build: ./nginx-config/  
+    image: nginx:1.0
+    container_name: nginx
+    restart: always
+    environment:
+      - VIRTUAL_HOST=site2.com
+      - LETSENCRYPT_HOST=site2.com
+      - LETSENCRYPT_EMAIL=suphavit.b@itp.co.th
+    links:
+      - php
+    volumes:
+      # - /var/www/vhosts/itt-lic-2.com/docker.itt-lic-2.com/web-volumes:/usr/share/nginx/html/
+      - ./web-volumes:/usr/share/nginx/html/
+    # ports:
+    #   - 80:80
+
+networks:
+  default:
+    external:
+      name: web

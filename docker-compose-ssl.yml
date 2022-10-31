@@ -1,0 +1,32 @@
+# docker-compose.yml
+version: '3.3'
+services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:                     
+      # - ./current/public:/usr/share/nginx/html ## SSL
+      # - ./certs:/etc/nginx/certs:ro ## SSL
+      - vhost:/etc/nginx/vhost.d
+      - /usr/share/nginx/html
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    labels:
+      - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy=true"
+
+  # letsencrypt: ## SSL
+  #   image: jrcs/letsencrypt-nginx-proxy-companion ## SSL
+  #   restart: always ## SSL
+  #   volumes: ## SSL
+  #     - ./certs:/etc/nginx/certs:rw ## SSL
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro ## SSL
+  #     - vhost:/etc/nginx/vhost.d ## SSL
+  #     - ./current/public:/usr/share/nginx/html ## SSL
+volumes:
+  vhost:
+networks:
+  default:
+    external:
+      name: web
